@@ -1,0 +1,27 @@
+#cards {
+    height: 5;
+}
+
+Card {
+    width: 1fr;
+    height: 100%;
+    border: round $primary;
+    content-align: center middle;
+    text-align: center;
+}
+
+#income   { border: round $success; }
+#expenses { border: round $error; }
+
+#main {
+    height: 1fr;
+}
+
+.panel {
+    height: 100%;
+    border: round $primary;
+    padding: 1;
+}
+
+#transactions { width: 2fr; }
+#chart        { width: 1fr; }   
