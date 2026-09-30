@@ -2,10 +2,11 @@ from textual.app import App, ComposeResult
 from textual.containers import Horizontal
 from textual.widgets import DataTable, Footer, Header, Static
 from rich.text import Text
-from data import TRANSACTIONS
+from charts import BarChart
+from data import TRANSACTIONS, expenses_by_category, totals
 
-def format_eur(amount: float) -> str:
-    text = f"{amount:+,.2f}"
+def format_eur(amount: float, sign: bool = True) -> str:
+    text = f"{amount:+,.2f}" if sign else f"{amount:,.2f}"
     text = text.replace(",", "X").replace(".", ",").replace("X", ".")
     return f"{text} €"
 
@@ -17,15 +18,17 @@ class FinanceApp(App):
     CSS_PATH = "app.tcss"
     BINDINGS = [("q" , "quit" , "Salir")]
 
-    def compose(self):
+    def compose(self) -> ComposeResult:
+        income, expenses, balance = totals()
         yield Header()
         with Horizontal(id="cards"):
-            yield Card("Saldo\n[b]12.450 €[/b]", id="balance")
-            yield Card("Ingresos\n[b]3.200 €[/b]", id="income")
-            yield Card("Gastos\n[b]1.850 €[/b]", id="expenses")
+            yield Card(f"Saldo\n[b]{format_eur(balance, sign=False)}[/b]", id="balance")
+            yield Card(f"Ingresos\n[b]{format_eur(income, sign=False)}[/b]", id="income")
+            yield Card(f"Gastos\n[b]{format_eur(expenses, sign=False)}[/b]", id="expenses")
         with Horizontal(id="main"):
             yield DataTable(id="transactions", classes="panel")
-            yield Static("Gráfico", id="chart" , classes="panel")
+            yield BarChart(expenses_by_category(), id="chart", classes="panel")
+        yield Footer()
 
     def on_mount(self):
         self.query_one("#chart").border_title = "Gastos por categoría"
